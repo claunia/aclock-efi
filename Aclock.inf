@@ -26,11 +26,15 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  
+  ShellPkg/ShellPkg.dec
+  StdLib/StdLib.dec
+
 [LibraryClasses]
+  LibC
+  LibMath
+  UefiBootServicesTableLib
   UefiApplicationEntryPoint
-  UefiLib
-  
+
 [Guids]
 
 [Ppis]
