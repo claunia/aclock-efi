@@ -7,12 +7,23 @@
   Copyright (c) 2016 Natalia Portillo <claunia@claunia.com>
 **/
 
+#ifdef GNU_EFI
+
+#include <efi.h>
+#include <efilib.h>
+// Copied math implementations from EDK2 source code
+#include "math_private.h"
+
+#else
+
 #include <Uefi.h>
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiLib.h>
 
 #include <math.h>
 #include <unistd.h>
+
+#endif
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -50,7 +61,11 @@ void draw_circle(int hand_max, int sYcen, int sXcen){
                 c='.';
                 break;
         }
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->SetCursorPosition, 3, ConOut, x, y);
+#else
         ConOut->SetCursorPosition(ConOut, x, y);
+#endif
         Print(L"%c", c);
     }
 }
@@ -62,7 +77,11 @@ void draw_hand(int minute, int hlenght, char c, int sXcen, int sYcen){
     for(n=1; n<hlenght; n++){
         x=cos(r)*n*FontWH_Ratio+sXcen;
         y=sin(r)*n+sYcen;
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->SetCursorPosition, 3, ConOut, x, y);
+#else
         ConOut->SetCursorPosition(ConOut, x, y);
+#endif
         Print(L"%c", c);
     }
 }
@@ -79,11 +98,18 @@ void draw_hand(int minute, int hlenght, char c, int sXcen, int sYcen){
 **/
 EFI_STATUS
 EFIAPI
+#ifdef GNU_EFI
+efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE * SystemTable)
+#else
 UefiMain (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
+#endif
 {
+#ifdef GNU_EFI
+    InitializeLib(ImageHandle, SystemTable);
+#endif
     ConOut = SystemTable->ConOut;
     eST = SystemTable;
     EFI_TIME ltime;
@@ -94,13 +120,25 @@ UefiMain (
     int sXmax, sYmax, smax, hand_max, sXcen, sYcen;
 
     sXmax=sYmax=hand_max=sXcen=sYcen=0;
+#ifdef GNU_EFI
+    uefi_call_wrapper(ConOut->ClearScreen, 1, ConOut);
+#else
     ConOut->ClearScreen(ConOut);
+#endif
 
     while(1){
+#ifdef GNU_EFI
+        uefi_call_wrapper(eST->RuntimeServices->GetTime, 2, &ltime, NULL);
+#else
         eST->RuntimeServices->GetTime(&ltime, NULL);
+#endif
 
 	UINTN Columns, Rows;
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->QueryMode, 4, ConOut, ConOut->Mode->Mode, &Columns, &Rows);
+#else
         ConOut->QueryMode(ConOut, ConOut->Mode->Mode, &Columns, &Rows);
+#endif
         sYmax = (int)Rows;
         sXmax = (int)Columns;
 
@@ -114,19 +152,35 @@ UefiMain (
         sXcen = sXmax/2;
         sYcen = sYmax/2;
 
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->ClearScreen, 1, ConOut);
+#else
         ConOut->ClearScreen(ConOut);
+#endif
         draw_circle(hand_max, sYcen, sXcen);
 
         draw_hand((ltime.Hour*5)+(ltime.Minute/10), 2*hand_max/3, 'h', sXcen, sYcen);
         draw_hand(ltime.Minute, hand_max-2, 'm', sXcen, sYcen);
         draw_hand(ltime.Second, hand_max-1, '.', sXcen, sYcen);
 
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->SetCursorPosition, 3, ConOut, sXcen-5, sYcen-(3*hand_max/5));
+#else
         ConOut->SetCursorPosition(ConOut, sXcen-5, sYcen-(3*hand_max/5));
+#endif
         Print(L".:ACLOCK:.");
+#ifdef GNU_EFI
+        uefi_call_wrapper(ConOut->SetCursorPosition, 3, ConOut, sXcen-5, sYcen+(3*hand_max/5));
+#else
         ConOut->SetCursorPosition(ConOut, sXcen-5, sYcen+(3*hand_max/5));
+#endif
         Print(L"[%02d:%02d:%02d]", ltime.Hour, ltime.Minute, ltime.Second);
 
+#ifdef GNU_EFI
+        uefi_call_wrapper(eST->BootServices->Stall, 1, 1000000);
+#else
         sleep(1);
+#endif
     }
 
     return EFI_SUCCESS;
