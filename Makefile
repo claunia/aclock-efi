@@ -1,5 +1,5 @@
 # Try to guess host machine
-ARCH            = $(shell $(CC) -dumpmachine | cut -f1 -d- | sed s,i[3456789]86,ia32,)
+ARCH            = $(shell gcc -dumpmachine | cut -f1 -d- | sed s,i[3456789]86,ia32,)
 
 # Override amd64
 ifeq ($(ARCH),amd64)
