@@ -5,5 +5,5 @@ cp -n binaries/aclock-efi-ia32.efi iso/EFI/BOOT/BOOTIA32.EFI
 cp -n binaries/aclock-efi-ia64.efi iso/EFI/BOOT/BOOTI64.EFI
 cp -n binaries/aclock-efi-arm.efi iso/EFI/BOOT/BOOTARM.EFI
 cp -n binaries/aclock-efi-aarch64.efi iso/EFI/BOOT/BOOTAA64.EFI
-mkisofs -o binaries/aclock-efi.iso iso
+mkisofs -A ACLOCK -V ACLOCK -sysid EFI -o binaries/aclock-efi.iso iso
 rm -Rfv iso

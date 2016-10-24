@@ -54,7 +54,7 @@ LDFLAGS         = -nostdlib --no-undefined --build-id=sha1 -T $(EFI_LDS) -shared
 			-Bsymbolic -L $(EFILIB) -L $(LIB) $(EFI_CRT_OBJS) 
 
 ifneq ($(HAVE_EFI_OBJCOPY),)
-FORMAT		:= --target efi-app-$(ARCH)
+FORMAT		:= --target=efi-app-$(ARCH)
 else
 SUBSYSTEM	:= 0xa
 FORMAT		:= -O binary
