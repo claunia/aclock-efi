@@ -64,7 +64,7 @@ endif
 all: $(TARGET)
 
 aclock-efi-$(ARCH).so: $(OBJS)
-	ld $(LDFLAGS) $(OBJS) -o $@ -lefi -lgnuefi
+	$(LD) $(LDFLAGS) $(OBJS) -o $@ -lefi -lgnuefi
 
 %.efi: %.so
 	objcopy -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
