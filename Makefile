@@ -1,5 +1,5 @@
 # Try to guess host machine
-ARCH            = $(shell gcc -dumpmachine | cut -f1 -d- | sed s,i[3456789]86,ia32,)
+ARCH            = $(shell $(CC) -dumpmachine | cut -f1 -d- | sed s,i[3456789]86,ia32,)
 
 # Override amd64
 ifeq ($(ARCH),amd64)
@@ -43,8 +43,7 @@ TARGET          = aclock-efi-$(ARCH).efi
 
 EFIINC          = /usr/include/efi
 EFIINCS         = -I$(EFIINC) -I$(EFIINC)/$(ARCH) -I$(EFIINC)/protocol
-LIB             = /usr/lib64
-EFILIB          = /usr/lib64
+EFILIB          = $(LIB)
 EFI_CRT_OBJS    = $(EFILIB)/crt0-efi-$(ARCH).o
 EFI_LDS         = $(EFILIB)/elf_$(ARCH)_efi.lds
 
