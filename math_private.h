@@ -64,6 +64,16 @@ typedef union
 
 #endif
 
+/* Get two 32 bit ints from a double.  */
+
+#define EXTRACT_WORDS(ix0,ix1,d)        \
+do {                \
+  ieee_double_shape_type ew_u;          \
+  ew_u.value = (d);           \
+  (ix0) = ew_u.parts.msw;         \
+  (ix1) = ew_u.parts.lsw;         \
+} while (0)
+
 /* Get the more significant 32 bit int from a double.  */
 
 #define GET_HIGH_WORD(i,d)          \
@@ -130,6 +140,12 @@ double  sin(double Arg);
 **/
 double  fabs(double Arg);
 
+/** Compute the largest integer value not greater than Arg.
+    @param[in]    Arg   The value to compute the floor of.
+    @return   The largest integer value not greater than Arg, expressed as a floating-point number.
+**/
+double  floor(double);
+
 /* ieee style elementary functions */
 extern int    __ieee754_rem_pio2 (double,double*);
 
@@ -137,5 +153,15 @@ extern int    __ieee754_rem_pio2 (double,double*);
 extern double __kernel_sin (double, double, int);
 extern double __kernel_cos (double, double);
 extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const int*);
+
+
+/**@{
+    C99, Posix, or NetBSD functions that are not part of the C95 specification.
+**/
+/*
+ * Functions callable from C, intended to support IEEE arithmetic.
+ */
+double  scalbn(double, int);
+double  copysign(double, double);
 
 #endif /* _MATH_PRIVATE_H_ */
