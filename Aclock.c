@@ -116,7 +116,7 @@ UefiMain (
 
     /*char INFO[]="Copyright (c) 1994-2016 Antoni Sawicki <as@tenoware.com>\n"
                 "Copyright (c) 2016 Natalia Portillo <claunia@claunia.com>\n"
-                "Version 1.0 (efi); Canary Islands, May 2016\n";*/
+                "Version 1.1 (efi); Canary Islands, October 2016\n";*/
     int sXmax, sYmax, smax, hand_max, sXcen, sYcen;
 
     sXmax=sYmax=hand_max=sXcen=sYcen=0;
