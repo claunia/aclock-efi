@@ -11,22 +11,29 @@
 
 #include <efi.h>
 #include <efilib.h>
-// Copied math implementations from EDK2 source code
-#include "math_private.h"
 
 #else
 
 #include <Uefi.h>
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiLib.h>
-
 #include <math.h>
 #include <unistd.h>
 
 #endif
 
+// GNU EFI does not include libm, so use precomputed values
+#ifdef GNU_EFI
+
+int cosa[]={    0, 105, 208, 309, 407, 500, 588, 669, 743, 809, 866, 914, 951, 978, 995,1000, 995, 978, 951, 914, 866, 809, 743, 669, 588, 500, 407, 309, 208, 105,   0,-105,-208,-309,-407,-500,-588,-669,-743,-809,-866,-914,-951,-978,-995,-1000,-995,-978,-951,-914,-866,-809,-743,-669,-588,-500,-407,-309,-208,-105 };
+int sina[]={ -1000,-995,-978,-951,-914,-866,-809,-743,-669,-588,-500,-407,-309,-208,-105,   0, 105, 208, 309, 407, 500, 588, 669, 743, 809, 866, 914, 951, 978, 995,1000, 995, 978, 951, 914, 866, 809, 743, 669, 588, 500, 407, 309, 208, 105,   0,-105,-208,-309,-407,-500,-588,-669,-743,-809,-866,-914,-951,-978,-995 };
+
+#else
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
+
 #endif
 
 #define FontWH_Ratio 2
@@ -40,8 +47,13 @@ void draw_circle(int hand_max, int sYcen, int sXcen){
     char c;
 
     for(r=0;r<60;r++){
+#ifdef GNU_EFI
+        x=(cosa[r]*hand_max*FontWH_Ratio/1000)+sXcen;
+        y=(sina[r]*hand_max/1000)+sYcen;
+#else
         x=cos(r*M_PI/180*6)*hand_max*FontWH_Ratio+sXcen;
         y=sin(r*M_PI/180*6)*hand_max+sYcen;
+#endif
         switch (r) {
             case 0:
             case 5:
@@ -72,14 +84,16 @@ void draw_circle(int hand_max, int sYcen, int sXcen){
 
 void draw_hand(int minute, int hlenght, char c, int sXcen, int sYcen){
     int x,y,n;
-    float r=(minute-15)*(M_PI/180)*6;
 
     for(n=1; n<hlenght; n++){
-        x=cos(r)*n*FontWH_Ratio+sXcen;
-        y=sin(r)*n+sYcen;
 #ifdef GNU_EFI
+        x=(cosa[minute]*n*FontWH_Ratio/1000)+sXcen;
+        y=(sina[minute]*n/1000)+sYcen;
         uefi_call_wrapper(ConOut->SetCursorPosition, 3, ConOut, x, y);
 #else
+        float r=(minute-15)*(M_PI/180)*6;
+        x=cos(r)*n*FontWH_Ratio+sXcen;
+        y=sin(r)*n+sYcen;
         ConOut->SetCursorPosition(ConOut, x, y);
 #endif
         Print(L"%c", c);

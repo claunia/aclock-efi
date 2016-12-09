@@ -38,7 +38,7 @@ ifeq ($(ARCH),arm)
 	CFLAGS += -marm
 endif
 
-OBJS            = s_fabs.o s_copysign.o s_scalbn.o s_floor.o k_rem_pio2.o e_rem_pio2.o k_cos.o k_sin.o s_cos.o s_sin.o Aclock.o
+OBJS            = Aclock.o
 TARGET          = aclock-efi-$(ARCH).efi
 
 EFIINC          = /usr/include/efi
